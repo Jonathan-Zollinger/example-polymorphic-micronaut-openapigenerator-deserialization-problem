@@ -1,0 +1,27 @@
+openapi: 3.0.3
+info:
+  title: OneOf Example
+  version: 1.0.0
+
+components:
+  schemas:
+    CustomField:
+      type: object
+      required:
+        - id
+        - value
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          oneOf:
+            - type: integer
+              format: int64
+            - type: number
+              format: double
+            - type: string
+            - type: boolean
+            - type: array
+              items:
+                type: string
