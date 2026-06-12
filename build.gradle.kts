@@ -42,17 +42,6 @@ micronaut {
         incremental(true)
         annotations("com.example.*")
     }
-    openapi {
-        client(file("src/main/resources/schema.yml")) {
-            apiPackageName = "com.example.client"
-            modelPackageName = "com.example.model"
-            useReactive = true
-            useAuth = false
-            lombok.set(true)
-            clientId = "example"
-            apiNameSuffix = "Client"
-        }
-    }
 }
 
 
