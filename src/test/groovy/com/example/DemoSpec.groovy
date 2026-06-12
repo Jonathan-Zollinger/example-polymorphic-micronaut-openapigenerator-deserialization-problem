@@ -6,7 +6,6 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
 import spock.lang.Unroll
-import io.micronaut.core.type.Argument
 
 @MicronautTest
 class DemoSpec extends Specification {
@@ -15,7 +14,7 @@ class DemoSpec extends Specification {
     ObjectMapper objectMapper
 
     @Unroll
-    def "should deserialize polymorphic custom field type: #expectedClass.simpleName"() {
+    def "should deserialize polymorphic custom field type: #expectedRecord.simpleName"() {
         given: "A raw JSON snippet representing a customized field payload"
         def json = """{"id": 42, "value": ${jsonValue}}"""
 
@@ -25,52 +24,39 @@ class DemoSpec extends Specification {
 
         then:
         verifyAll {
-            result.id == 42
-            expectedClass.isInstance(result.value)
-            result.getValue() == expectedValue
+            result.id() == 42
+            expectedRecord.isInstance(result)
+            result.value() == expectedValue
         }
 
         where:
-        jsonValue             | expectedClass | expectedValue
-        '"flibberty giblets"' | String        | "flibberty giblets"
-        'true'                | Boolean       | true
-        '10023'               | Long          | 10023L
-        '45.29'               | Float         | 45.29f
-        '["alpha","beta"]'    | List          | ["alpha", "beta"]
+        jsonValue             | expectedRecord               | expectedValue
+        '"flibberty giblets"' | TicketCustomField.Text       | "flibberty giblets"
+        'true'                | TicketCustomField.Checkbox   | true
+        '10023'               | TicketCustomField.Numeric    | 10023L
+        '45.29'               | TicketCustomField.Decimal    | 45.29f
+        '["alpha","beta"]'    | TicketCustomField.TagList    | ["alpha", "beta"]
     }
 
-    def "should deserialize with specific generic type"() {
+    def "should serialize sealed interface implementation"() {
         given:
-        def json = '{"id": 1, "value": "hello"}'
-        
-        when:
-        def result = objectMapper.readValue(json, Argument.of(TicketCustomField, String))
-        
-        then:
-        result.id == 1L
-        result.value == "hello"
-        result.value instanceof String
-    }
+        def field = new TicketCustomField.Text(123L, "hello")
 
-    def "should serialize polymorphic custom field"() {
-        given:
-        def field = new TicketCustomField<String>(id: 123L, value: "test-value")
-        
         when:
         def json = objectMapper.writeValueAsString(field)
-        
+
         then:
-        json == '{"id":123,"value":"test-value"}'
+        json == '{"id":123,"value":"hello"}'
     }
 
-    def "should serialize with list value"() {
+    def "should serialize tag list"() {
         given:
-        def field = new TicketCustomField<List<String>>(id: 456L, value: ["one", "two"])
-        
+        def field = new TicketCustomField.TagList(456L, ["a", "b"])
+
         when:
         def json = objectMapper.writeValueAsString(field)
-        
+
         then:
-        json == '{"id":456,"value":["one","two"]}'
+        json == '{"id":456,"value":["a","b"]}'
     }
 }
