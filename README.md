@@ -14,6 +14,7 @@ The [test] attempts to deserialize JSON payloads that match the schema in the oa
 Tests fail with 
 > No bean introspection available for type [interface com.example.model.CustomFieldValue]. Ensure the class is annotated with io.micronaut.core.annotation.Introspected
 
+For comparison, [this branch employs a working solution without a generator](https://github.com/Jonathan-Zollinger/example-polymorphic-micronaut-openapigenerator-deserialization-problem/tree/not-generated-version).
 
 [OpenAPI schema in this build]:src/main/resources/schema.yml
 [test]:src/test/groovy/com/example/DemoSpec.groovy
